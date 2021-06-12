@@ -10,15 +10,12 @@ var currentUV = document.querySelector('#current-UV');
 var listOfCities = document.querySelector('#listofcities');
 var fiveDayForecast = document.querySelector('#forecast');
 
-// Unused Variables
-var languageButtonsEl = document.querySelector('#language-buttons');
-var repoContainerEl = document.querySelector('#repos-container');
-var repoSearchTerm = document.querySelector('#repo-search-term');
 
-
-
+// Set up variable to place cities that have been searched.
 var savedCities = [];
-// TODO: This will be the city entered check function.
+
+
+// Function that checks whether the city name exists. If it does, it will load it into the get weather function. This is from the seach bar only.
 var formSubmitHandler = function (event) {
   event.preventDefault();
 
@@ -33,10 +30,9 @@ var formSubmitHandler = function (event) {
   }
 };
 
-// // TODO: Need a function to load cities onto buttons to use with buttonClickHandler()
-// // START HERE!
 
-// // TODO: Use this for the reuse of cities.
+// Use this for the reuse of cities. When a button is clicked, the data-name is taking from the button that was clicked and run through the weather app. 
+// This does not produce additional button.
 var buttonClickHandler = function (event) {
   var nextCity = event.target.getAttribute('data-name');
 
