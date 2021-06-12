@@ -1,51 +1,96 @@
+
+// Variables in use
 var userFormEl = document.querySelector('#user-form');
+var nameInputEl = document.querySelector('#cityname');
+var displayedCity = document.querySelector('#displayed-city');
+var currentTemp = document.querySelector('#current-temp');
+var currentWind = document.querySelector('#current-wind');
+var currentHumidity= document.querySelector('#current-humidity');
+var currentUV = document.querySelector('#current-UV');
+var listOfCities = document.querySelector('#listofcities');
+var fiveDayForecast = document.querySelector('#forecast');
+
+// Unused Variables
 var languageButtonsEl = document.querySelector('#language-buttons');
-var nameInputEl = document.querySelector('#username');
 var repoContainerEl = document.querySelector('#repos-container');
 var repoSearchTerm = document.querySelector('#repo-search-term');
 
+
+
+var savedCities = [];
 // TODO: This will be the city entered check function.
-// var formSubmitHandler = function (event) {
-//   event.preventDefault();
+var formSubmitHandler = function (event) {
+  event.preventDefault();
 
-//   var username = nameInputEl.value.trim();
+  var cityname = nameInputEl.value.trim();
+  console.log(cityname);
 
-//   if (username) {
-//     getUserRepos(username);
+  if (cityname) {
+    getCityWeather(cityname);
 
-//     repoContainerEl.textContent = '';
-//     nameInputEl.value = '';
-//   } else {
-//     alert('Please enter an actual City');
-//   }
-// };
+  } else {
+    alert('Please enter an actual City');
+  }
+};
 
-// TODO: Need a function to load cities onto buttons to use with buttonClickHandler()
-// START HERE!
+// // TODO: Need a function to load cities onto buttons to use with buttonClickHandler()
+// // START HERE!
 
-// TODO: Use this for the reuse of cities.
-// var buttonClickHandler = function (event) {
-//   var language = event.target.getAttribute('data-language');
+// // TODO: Use this for the reuse of cities.
+var buttonClickHandler = function (event) {
+  var nextCity = event.target.getAttribute('data-name');
 
-//   if (language) {
-//     getFeaturedRepos(language);
+  if (nextCity) {
+    getSavedCityWeather(nextCity);
 
-//     repoContainerEl.textContent = '';
-//   }
-// };
+  }
+};
 
 // TODO: This will be the initial call for city searched. Needs to include save to localstorage and also button produced in button section
-var getUserRepos = function () {
-  var apiUrl = 'https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.79&appid=03b889d282ee365bc5916525efd12b28';
-//   https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.79&appid=03b889d282ee365bc5916525efd12b28
-
+var getCityWeather = function (cityname) {
+  fiveDayForecast.innerHTML = '';
+  console.log(cityname);
+  var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + cityname +'&units=imperial&appid=03b889d282ee365bc5916525efd12b28';
+  var apiUrl2 = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cityname + '&units=imperial&appid=03b889d282ee365bc5916525efd12b28';
+  // ONE CALL   https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.79&appid=03b889d282ee365bc5916525efd12b28
+  // CALL BY CITY NAME  https://api.openweathermap.org/data/2.5/weather?q=' + cityname +'&appid=03b889d282ee365bc5916525efd12b28
   fetch(apiUrl)
-    .then(function (response) {
+    .then(function (response) { 
       if (response.ok) {
         console.log(response);
         response.json().then(function (data) {
           console.log(data);
-        //   displayRepos(data);
+          var sCity = data.name;
+          console.log(savedCities.includes(sCity));
+          if (savedCities.includes(sCity)){
+          // DO nothing
+          } else{
+          savedCities.push(sCity);
+          localStorage.setItem("Cities", JSON.stringify(savedCities));
+          var button = document.createElement("button");
+          button.textContent = sCity;
+          button.setAttribute("class","btn btn-primary");
+          button.setAttribute("data-name", sCity);
+
+          listOfCities.appendChild(button);
+          };
+          displayCurrent(data);
+          });
+      } else {
+        alert('Error: ' + response.statusText);
+      }
+    })
+    .catch(function (error) {
+      alert('Unable to connect to OpenWeather');
+    });
+    fetch(apiUrl2)
+    .then(function (response) { 
+      if (response.ok) {
+        console.log(response);
+        response.json().then(function (data) {
+          console.log(data);
+          displayForecast(data);
+
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -56,78 +101,91 @@ var getUserRepos = function () {
     });
 };
 
-// TODO: This part may be uneeded. I need buttons to appear once searched for. This just finds what language from old example.
-// var getFeaturedRepos = function (language) {
-//   var apiUrl = 'https://api.github.com/search/repositories?q=' + language + '+is:featured&sort=help-wanted-issues';
 
-//   fetch(apiUrl).then(function (response) {
-//     if (response.ok) {
-//       response.json().then(function (data) {
-//         displayRepos(data.items, language);
-//       });
-//     } else {
-//       alert('Error: ' + response.statusText);
-//     }
-//   });
-// };
-
-// TODO: This function will be the one to display the weather blocks. Start with just displaying whats in the response.
-var displayRepos = function (repos, searchTerm) {
-  if (repos.length === 0) {
-    repoContainerEl.textContent = 'No repositories found.';
+// // TODO: This function will be the one to display the weather blocks. Start with just displaying whats in the response.
+var displayCurrent = function (data) {
+  if (data.length === 0) {
+    alert('No city found');
     return;
   }
+    var cName = data.name;
+    var cTemp = data.main.temp;
+    var cWind = data.wind.gust;
+    var cHumidity = data.main.humidity;
+    console.log(cName, cTemp, cWind, cHumidity);
 
-  repoSearchTerm.textContent = searchTerm;
-
-  for (var i = 0; i < repos.length; i++) {
-    var repoName = repos[i].owner.login + '/' + repos[i].name;
-
-    var repoEl = document.createElement('a');
-    repoEl.classList = 'list-item flex-row justify-space-between align-center';
-    repoEl.setAttribute('href', './single-repo.html?repo=' + repoName);
-
-    var titleEl = document.createElement('span');
-    titleEl.textContent = repoName;
-
-    repoEl.appendChild(titleEl);
-
-    var statusEl = document.createElement('span');
-    statusEl.classList = 'flex-row align-center';
-
-    if (repos[i].open_issues_count > 0) {
-      statusEl.innerHTML =
-        "<i class='fas fa-times status-icon icon-danger'></i>" + repos[i].open_issues_count + ' issue(s)';
-    } else {
-      statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
-    }
-
-    repoEl.appendChild(statusEl);
-
-    repoContainerEl.appendChild(repoEl);
+    displayedCity.textContent = cName;
+    currentTemp.textContent = 'Temp: ' + cTemp;
+    currentWind.textContent = 'Wind: ' + cWind;
+    currentHumidity.textContent = 'Humidity: ' + cHumidity;
+}
+var displayForecast = function (data) {
+  if (data.length === 0) {
+    alert('No city found');
+    return;
   }
-};
+  for (var i=0; i<5; i++){
+    var currentDate = new Date();
+    var day = currentDate.getDate() +1 + i;
+    var month = currentDate.getMonth() + 1;
+    var year = currentDate.getFullYear();
+    var fTemp = data.list[i].main.temp;
+    var fWind = data.list[i].wind.speed;
+    var fHumidity = data.list[i].main.humidity;
+    var fSky = data.list[i].weather[0].description;
+    console.log( fTemp, fWind, fHumidity, fSky);
 
-// userFormEl.addEventListener('submit', formSubmitHandler);
-// languageButtonsEl.addEventListener('click', buttonClickHandler);
+    var card = document.createElement("div");
+      card.setAttribute("class", "card text-white bg-dark mb-3");
+      card.setAttribute("style","max-width: 18rem;");
+      fiveDayForecast.appendChild(card);
+    var cardHeader = document.createElement("div");
+      cardHeader.setAttribute("class", "card-header");
+      cardHeader.textContent = month + "/" + day + "/" + year;
+      card.appendChild(cardHeader);
+    var cardBody = document.createElement("div");
+      cardBody.setAttribute("class", "card-body");
+      cardBody.textContent = 'Weather: ' + fSky;
+      card.appendChild(cardBody);
+    var ul = document.createElement("ul");
+      ul.setAttribute("class", "list-group list-group-flush");
+      card.appendChild(ul);
+    var li1 = document.createElement("li");
+      li1.setAttribute("class", "list-group-item");
+      li1.textContent =  fTemp;
+      ul.appendChild(li1);
+    var li2 = document.createElement("li");
+      li2.setAttribute("class", "list-group-item");
+      li2.textContent =  fWind;
+      ul.appendChild(li2);
+    var li3 = document.createElement("li");
+      li3.setAttribute("class", "list-group-item");
+      li3.textContent =  fHumidity;
+      ul.appendChild(li3);
+  }
+}
 
-// TODO: I need a get a function that finds a location of typed in by user.
-// TODO: I need a function/API that gives me current location.
+userFormEl.addEventListener('submit', formSubmitHandler);
+listOfCities.addEventListener('click', buttonClickHandler);
 
-// It needs temp, wind, humidity for boxes per day. Current includes UV index as last line.
-var apiUrl = 'https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.79&exclude=minutely,hourly,alerts&units=imperial&appid=03b889d282ee365bc5916525efd12b28';
-//   https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.79&appid=03b889d282ee365bc5916525efd12b28
 
+
+
+var getSavedCityWeather = function (nextCity) {
+  fiveDayForecast.innerHTML = '';
+  console.log(nextCity);
+  var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + nextCity +'&units=imperial&appid=03b889d282ee365bc5916525efd12b28';
+  var apiUrl2 = 'https://api.openweathermap.org/data/2.5/forecast?q=' + nextCity + '&units=imperial&appid=03b889d282ee365bc5916525efd12b28';
+  // ONE CALL   https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.79&appid=03b889d282ee365bc5916525efd12b28
+  // CALL BY CITY NAME  https://api.openweathermap.org/data/2.5/weather?q=' + cityname +'&appid=03b889d282ee365bc5916525efd12b28
   fetch(apiUrl)
-    .then(function (response) {
+    .then(function (response) { 
       if (response.ok) {
         console.log(response);
         response.json().then(function (data) {
           console.log(data);
-          var text = data.current.temp;
-          console.log(text);
-          repoContainerEl.textContent = 'The Current temp is ' + text;
-        //   displayRepos(data);
+          displayCurrent(data);
+
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -136,4 +194,38 @@ var apiUrl = 'https://api.openweathermap.org/data/2.5/onecall?lat=32.77&lon=-96.
     .catch(function (error) {
       alert('Unable to connect to OpenWeather');
     });
-    
+    fetch(apiUrl2)
+    .then(function (response) { 
+      if (response.ok) {
+        console.log(response);
+        response.json().then(function (data) {
+          console.log(data);
+          displayForecast(data);
+
+        });
+      } else {
+        alert('Error: ' + response.statusText);
+      }
+    })
+    .catch(function (error) {
+      alert('Unable to connect to OpenWeather');
+    });
+};
+
+
+function init() {
+  var localSavedCities = JSON.parse(localStorage.getItem("Cities"));
+
+  if (localSavedCities !== null){
+    savedCities = localSavedCities;
+  }
+  for (var i = 0; i < savedCities.length; i++){
+    var button = document.createElement("button");
+          button.textContent = savedCities[i];
+          button.setAttribute("class","btn btn-primary");
+          button.setAttribute("data-name", savedCities[i]);
+          listOfCities.appendChild(button);
+  }
+
+}
+init();

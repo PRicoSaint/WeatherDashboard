@@ -5,21 +5,126 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,400i,700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+
+
+  <!-- <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,400i,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
-  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="stylesheet" href="./assets/css/style.css" /> -->
   <title>A Dashboard for Weather</title>
 </head>
 
-<body class="flex-column min-100-vh">
-  <header class="hero">
-    <h1 class="app-title"> Weather Dashboard</h1>
-    <p>Search for a City and see their current Weather and 5 day forecast
-    </p>
-  </header>
+<body>
+  <!-- Top Bar with search for City -->
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand">Weather Dashboard</a>
+    </div>
+  </nav>
+ 
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3">
+        <div  id="listofcities" class="d-grid gap-2">
+          <form id="user-form" class="d-flex">
+            <h2>Search for a City:</h2>
+            <input name="cityname" id="cityname" class="form-control me-2" type="text" placeholder="" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+          <!-- <button class="btn btn-primary" type="button">Button</button>
+          <button class="btn btn-primary" type="button">Button</button>
+          <button class="btn btn-primary" type="button">Button</button>
+          <button class="btn btn-primary" type="button">Button</button> -->
+        </div>
+      </div>
+      <div class="col-sm">
+      <div class="card" style="width: 100%;">
+        <!-- <img src="..." class="card-img-top" alt="..."> -->
+        <div class="card-body">
+          <h5 id="displayed-city"class="card-title"></h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li id="current-temp"class="list-group-item"></li>
+          <li id="current-wind"class="list-group-item"></li>
+          <li id="current-humidity"class="list-group-item"></li>
+          <li id="current-UV"class="list-group-item">UV Index:</li>
+        </ul>
+      </div>
+      <h2>5-Day Forecast:</h2>
+      <div id="forecast" class ="card-group">
+        <!-- <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header">Date</div>
+          <div class="card-body">
+            <h5 class="card-title">Forecast Thumbnail</h5>
+
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Temp:</li>
+            <li class="list-group-item">Wind:</li>
+            <li class="list-group-item">Humidity:</li>
+          </ul>
+        </div>
+        <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header">Date</div>
+          <div class="card-body">
+            <h5 class="card-title">Forecast Thumbnail</h5>
+
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Temp:</li>
+            <li class="list-group-item">Wind:</li>
+            <li class="list-group-item">Humidity:</li>
+          </ul>
+        </div>
+        <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header">Date</div>
+          <div class="card-body">
+            <h5 class="card-title">Forecast Thumbnail</h5>
+
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Temp:</li>
+            <li class="list-group-item">Wind:</li>
+            <li class="list-group-item">Humidity:</li>
+          </ul>
+        </div>
+        <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header">Date</div>
+          <div class="card-body">
+            <h5 class="card-title">Forecast Thumbnail</h5>
+
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Temp:</li>
+            <li class="list-group-item">Wind:</li>
+            <li class="list-group-item">Humidity:</li>
+          </ul>
+        </div>
+        <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header">Date</div>
+          <div class="card-body">
+            <h5 class="card-title">Forecast Thumbnail</h5>
+
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Temp:</li>
+            <li class="list-group-item">Wind:</li>
+            <li class="list-group-item">Humidity:</li>
+          </ul>
+        </div> -->
+
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
 
 
-  <main class="flex-row justify-space-between">
+
+
+  <!-- <main class="flex-row justify-space-between">
     <div class="col-12 col-md-4">
 
       <div class="card">
@@ -45,8 +150,11 @@
         <h2 class="subtitle">City 5 day forecast here <span id="repo-search-term"></span></h2>
         <div id="repos-container" class="list-group"></div>
       </div>
-  </main>
+  </main> -->
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+    crossorigin="anonymous"></script>
   <script src="./assets/js/script.js"></script>
 </body>
 
