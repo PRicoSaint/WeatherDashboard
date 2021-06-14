@@ -1,5 +1,5 @@
 
-// Variables in use
+// Variables used for Queryselectors on the HTML file.
 var userFormEl = document.querySelector('#user-form');
 var nameInputEl = document.querySelector('#cityname');
 var displayedCity = document.querySelector('#displayed-city');
@@ -11,9 +11,10 @@ var listOfCities = document.querySelector('#listofcities');
 var fiveDayForecast = document.querySelector('#forecast');
 
 
-// Set up variable to place cities that have been searched.
+// Set up variable to place cities that have been searched and global variables for coordinates.
 var savedCities = [];
-
+var cityLat = [];
+var cityLon = [];
 
 // Function that checks whether the city name exists. If it does, it will load it into the get weather function. This is from the seach bar only.
 var formSubmitHandler = function (event) {
@@ -42,7 +43,7 @@ var buttonClickHandler = function (event) {
   }
 };
 
-// TODO: This will be the initial call for city searched. Needs to include save to localstorage and also button produced in button section
+// This will be the initial call for city searched. Needs to include save to localstorage and also button produced in button section
 var getCityWeather = function (cityname) {
   fiveDayForecast.innerHTML = '';
   console.log(cityname);
@@ -56,6 +57,7 @@ var getCityWeather = function (cityname) {
         console.log(response);
         response.json().then(function (data) {
           console.log(data);
+          loadCoords(data);
           var sCity = data.name;
           console.log(savedCities.includes(sCity));
           if (savedCities.includes(sCity)){
@@ -79,6 +81,8 @@ var getCityWeather = function (cityname) {
     .catch(function (error) {
       alert('Unable to connect to OpenWeather');
     });
+    console.log(cityLat);
+    console.log(cityLon);
     fetch(apiUrl2)
     .then(function (response) { 
       if (response.ok) {
@@ -86,7 +90,6 @@ var getCityWeather = function (cityname) {
         response.json().then(function (data) {
           console.log(data);
           displayForecast(data);
-
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -98,7 +101,8 @@ var getCityWeather = function (cityname) {
 };
 
 
-// // TODO: This function will be the one to display the weather blocks. Start with just displaying whats in the response.
+// This function will be the one to display the current weather for City search or clicked.
+//  Start with just displaying whats in the response.
 var displayCurrent = function (data) {
   if (data.length === 0) {
     alert('No city found');
@@ -106,15 +110,22 @@ var displayCurrent = function (data) {
   }
     var cName = data.name;
     var cTemp = data.main.temp;
-    var cWind = data.wind.gust;
+    var cWind = data.wind.speed;
     var cHumidity = data.main.humidity;
-    console.log(cName, cTemp, cWind, cHumidity);
+    var cIcon = data.weather[0].icon;
+    var cIconURL = "http://openweathermap.org/img/w/" + cIcon + ".png";
+    console.log(cName, cTemp, cWind, cHumidity, cIcon);
 
     displayedCity.textContent = cName;
+    var iconLoc = document.createElement("img");
+    iconLoc.setAttribute("src", cIconURL);
+    displayedCity.appendChild(iconLoc);
     currentTemp.textContent = 'Temp: ' + cTemp;
-    currentWind.textContent = 'Wind: ' + cWind;
+    currentWind.textContent = 'Wind: ' + cWind + ' mph';
     currentHumidity.textContent = 'Humidity: ' + cHumidity;
 }
+// This function obtains data from fetch forcast API call. 
+// It will load it into variables and display on it on screen, creating the necessary cards in the process.
 var displayForecast = function (data) {
   if (data.length === 0) {
     alert('No city found');
@@ -128,6 +139,8 @@ var displayForecast = function (data) {
     var fTemp = data.list[i].main.temp;
     var fWind = data.list[i].wind.speed;
     var fHumidity = data.list[i].main.humidity;
+    var fIcon = data.list[i].weather[0].icon;
+    var fIconURL = "http://openweathermap.org/img/w/" + fIcon + ".png";
     var fSky = data.list[i].weather[0].description;
     console.log( fTemp, fWind, fHumidity, fSky);
 
@@ -141,32 +154,36 @@ var displayForecast = function (data) {
       card.appendChild(cardHeader);
     var cardBody = document.createElement("div");
       cardBody.setAttribute("class", "card-body");
-      cardBody.textContent = 'Weather: ' + fSky;
+      var fIconLoc = document.createElement("img");
+      fIconLoc.setAttribute("src", fIconURL);
+      fIconLoc.setAttribute("alt", fSky);
+      cardBody.appendChild(fIconLoc);
       card.appendChild(cardBody);
     var ul = document.createElement("ul");
       ul.setAttribute("class", "list-group list-group-flush");
       card.appendChild(ul);
     var li1 = document.createElement("li");
       li1.setAttribute("class", "list-group-item");
-      li1.textContent =  fTemp;
+      li1.textContent = "Temp: " + fTemp;
       ul.appendChild(li1);
     var li2 = document.createElement("li");
       li2.setAttribute("class", "list-group-item");
-      li2.textContent =  fWind;
+      li2.textContent = 'Wind: '+ fWind;
       ul.appendChild(li2);
     var li3 = document.createElement("li");
       li3.setAttribute("class", "list-group-item");
-      li3.textContent =  fHumidity;
+      li3.textContent = 'Humidity: ' + fHumidity;
       ul.appendChild(li3);
   }
 }
 
+// Both event listeners, one that looks for the search input and another from the buttons that are populated after previous searches are finished.
 userFormEl.addEventListener('submit', formSubmitHandler);
 listOfCities.addEventListener('click', buttonClickHandler);
 
 
 
-
+// When button containing previous city is clicked, it will run this function. Obtaining current weather and forecast along with UV Index.
 var getSavedCityWeather = function (nextCity) {
   fiveDayForecast.innerHTML = '';
   console.log(nextCity);
@@ -180,8 +197,8 @@ var getSavedCityWeather = function (nextCity) {
         console.log(response);
         response.json().then(function (data) {
           console.log(data);
+          loadCoords(data);
           displayCurrent(data);
-
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -197,7 +214,6 @@ var getSavedCityWeather = function (nextCity) {
         response.json().then(function (data) {
           console.log(data);
           displayForecast(data);
-
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -208,7 +224,7 @@ var getSavedCityWeather = function (nextCity) {
     });
 };
 
-
+// Looks in local storage and sees if any values exists under cities key. If so, it will load them into the script and populate buttons below search bar.
 function init() {
   var localSavedCities = JSON.parse(localStorage.getItem("Cities"));
 
@@ -223,5 +239,40 @@ function init() {
           listOfCities.appendChild(button);
   }
 
+}
+// Takes coordinates from previous call, runs one call to obtain UV index data and loads it onto the page.
+var loadCoords = function(data){
+  cityLat = data.coord.lat;
+  cityLon = data.coord.lon;
+  console.log(cityLat);
+  console.log(cityLon);
+  var apiUrl3 = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + cityLat + '&lon=' + cityLon + '&exclude=minutely,hourly,alerts&units=imperial&appid=03b889d282ee365bc5916525efd12b28';
+  fetch(apiUrl3)
+    .then(function (response) { 
+      if (response.ok) {
+        console.log(response);
+        response.json().then(function (data) {
+          var cUV = data.current.uvi;
+          console.log(cUV);
+          currentUV.textContent = 'UV Index: ' + cUV;
+          if (cUV < 2){
+            currentUV.setAttribute("class", "list-group-item green");
+          }else if (cUV >= 2 && cUV < 6){
+            currentUV.setAttribute("class", "list-group-item yellow");
+          }else if (cUV >= 6 && cUV < 8){
+            currentUV.setAttribute("class", "list-group-item orange");
+          }else if (cUV >= 8 && cUV < 11){
+            currentUV.setAttribute("class", "list-group-item red");
+          }else if (cUV >= 11){
+            currentUV.setAttribute("class", "list-group-item lightblue");
+          }
+        });
+      } else {
+        alert('Error: ' + response.statusText);
+      }
+    })
+    .catch(function (error) {
+      alert('Unable to connect to OpenWeather');
+    });
 }
 init();

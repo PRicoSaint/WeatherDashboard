@@ -1,1 +1,18 @@
-
+.green{
+    background-color: rgb(7, 177, 7);
+}
+.yellow{
+    background-color: yellow;
+}
+.orange{
+    background-color: orange;
+}
+.red{
+    background-color:red;
+}
+.lightblue{
+    background-color: lightblue;
+}
+.weather{
+    text-align: center;
+}
