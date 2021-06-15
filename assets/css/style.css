@@ -1,3 +1,4 @@
+/* Most of this css is just to change background colors for behaviour surrounding UV index. */
 .green{
     background-color: rgb(7, 177, 7);
 }
@@ -15,4 +16,11 @@
 }
 .weather{
     text-align: center;
+}
+/* This section hides or shows card for current city weather. */
+.vis{
+    visibility: show;
+}
+.hidden{
+    visibility: hidden;
 }
